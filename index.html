@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taquería Juquilita</title>
+<title>TaquerÃ­a Juquilita</title>
 
 <style>
 body { margin:0; font-family: Arial; background:#f5f5f5; }
@@ -89,7 +89,7 @@ button {
 
 <body>
 
-<header>Taquería Juquilita</header>
+<header>TaquerÃ­a Juquilita</header>
 
 <div id="menu"></div>
 
@@ -100,7 +100,7 @@ button {
 Total: $<span id="total">0</span><br>
 
 <input id="nombreCliente" placeholder="Tu nombre">
-<input id="direccionCliente" placeholder="Tu dirección">
+<input id="direccionCliente" placeholder="Tu direcciÃ³n">
 
 <textarea id="indicaciones" placeholder="Sin cebolla, con todo, etc"></textarea>
 
@@ -133,7 +133,7 @@ const numero2 = "522212175887";
 const menuData = [
 
 {categoria:"Hamburguesas",items:[
-["Hamburguesa Clásica",45],
+["Hamburguesa ClÃ¡sica",45],
 ["Hamburguesa Hawaiana",55],
 ["Doble Carne",60],
 ["Guacamolera",65],
@@ -159,7 +159,7 @@ const menuData = [
 {categoria:"Alitas",items:[
 ["Alitas BBQ (5)",60],
 ["Alitas Mango Habanero (5)",60],
-["Alitas Búfalo (5)",60]
+["Alitas BÃºfalo (5)",60]
 ]},
 
 {categoria:"Burritos",items:[
@@ -266,7 +266,7 @@ let texto="Pedido #"+numeroPedido+"\nCliente:"+nombre+"\n\n";
 
 for(let i in carrito){texto+=carrito[i]+" x "+i+"\n";}
 
-texto+="\nTotal:$"+total+"\nDirección:"+direccion+"\nPago:"+pago+"\n";
+texto+="\nTotal:$"+total+"\nDirecciÃ³n:"+direccion+"\nPago:"+pago+"\n";
 
 if(pago==="Transferencia"){
 texto+="Enviar comprobante para confirmar.\n";
