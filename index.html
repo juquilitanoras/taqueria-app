@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taquería Juquilita</title>
+
+<style>
+body { margin:0; font-family: Arial; background:#f5f5f5; }
+
+header {
+  background:#ff3d00;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.categoria {
+  margin:10px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.producto {
+  background:white;
+  margin:10px;
+  border-radius:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.info { padding:10px; }
+
+.precio { color:#ff3d00; font-weight:bold; }
+
+.controles button {
+  margin:3px;
+  padding:5px 10px;
+  border:none;
+  border-radius:8px;
+  background:#ff3d00;
+  color:white;
+}
+
+#carrito {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:white;
+  padding:10px;
+  box-shadow:0 -3px 10px rgba(0,0,0,0.2);
+}
+
+#listaCarrito {
+  max-height:120px;
+  overflow:auto;
+}
+
+.item {
+  display:flex;
+  justify-content:space-between;
+}
+
+input, textarea, select {
+  width:90%;
+  padding:8px;
+  margin:4px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button {
+  background:#ff3d00;
+  color:white;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+}
+
+#datosPago {
+  display:none;
+  background:#eee;
+  padding:10px;
+  border-radius:10px;
+  margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Taquería Juquilita</header>
+
+<div id="menu"></div>
+
+<div id="carrito">
+
+<div id="listaCarrito"></div>
+
+Total: $<span id="total">0</span><br>
+
+<input id="nombreCliente" placeholder="Tu nombre">
+<input id="direccionCliente" placeholder="Tu dirección">
+
+<textarea id="indicaciones" placeholder="Sin cebolla, con todo, etc"></textarea>
+
+<select id="pago">
+<option>Efectivo</option>
+<option>Transferencia</option>
+</select>
+
+<div id="datosPago">
+Banco: BBVA<br>
+Nombre: Nora Guadalupe Paredes Victorio<br>
+Cuenta: 4152 3140 0533 4605<br>
+<img src="qr_pago.png" width="120">
+<button onclick="copiarPago()">Copiar datos</button>
+</div>
+
+<button onclick="enviarPedido()">Pedir</button>
+
+</div>
+
+<script>
+
+let carrito = {};
+let total = 0;
+let numeroPedido = localStorage.getItem("pedido") || 1;
+
+const numero1 = "522229314837";
+const numero2 = "522212175887";
+
+const menuData = [
+
+{categoria:"Hamburguesas",items:[
+["Hamburguesa Clásica",45],
+["Hamburguesa Hawaiana",55],
+["Doble Carne",60],
+["Guacamolera",65],
+["Hamburguesa Tocineta",70],
+["Tecuani Especial",75],
+["Hamburguesa Crujiente",60]
+]},
+
+{categoria:"Hot Dogs",items:[
+["Hot Dog Sencillo",20],
+["Hot Dog Especial",30],
+["Hot Dog Hawaiano",25],
+["Hot Dog Sonora Grill",40]
+]},
+
+{categoria:"Tacos",items:[
+["Orden de tacos de asada",65],
+["Orden de tacos de longaniza",65],
+["Orden de tacos campechanos",65],
+["Taco individual",15]
+]},
+
+{categoria:"Alitas",items:[
+["Alitas BBQ (5)",60],
+["Alitas Mango Habanero (5)",60],
+["Alitas Búfalo (5)",60]
+]},
+
+{categoria:"Burritos",items:[
+["Burrito Asada",60],
+["Burrito Longaniza",75],
+["Burrito Campechano",60]
+]},
+
+{categoria:"Mulitas",items:[
+["Mulita Asada",30],
+["Mulita Longaniza",40],
+["Mulita Campechana",30]
+]},
+
+{categoria:"Cemitas",items:[
+["Orden de cemitas asada (2)",45],
+["Cemitas longaniza (2)",55],
+["Cemitas campechanas (2)",50],
+["Cemita asada",25],
+["Cemita longaniza",30],
+["Cemita campechana",30]
+]},
+
+{categoria:"Extras",items:[
+["Papas a la francesa",50],
+["Nachos",80]
+]},
+
+{categoria:"Bebidas",items:[
+["Coca-Cola",25],
+["Boing",20],
+["Arizona",25]
+]}
+
+];
+
+function mostrar(){
+let html="";
+menuData.forEach(cat=>{
+html+=`<div class="categoria">${cat.categoria}</div>`;
+cat.items.forEach(p=>{
+html+=`
+<div class="producto">
+<div class="info">
+<h3>${p[0]}</h3>
+<div class="precio">$${p[1]}</div>
+<div class="controles">
+<button onclick="menos('${p[0]}',${p[1]})">-</button>
+<button onclick="mas('${p[0]}',${p[1]})">+</button>
+</div>
+</div>
+</div>`;
+});
+});
+document.getElementById("menu").innerHTML=html;
+}
+
+function mas(n,p){carrito[n]=(carrito[n]||0)+1; total+=p; actualizar();}
+function menos(n,p){if(carrito[n]){carrito[n]--; total-=p; if(carrito[n]<=0) delete carrito[n]; actualizar();}}
+
+function actualizar(){
+document.getElementById("total").innerText=total;
+let lista="";
+for(let i in carrito){
+lista+=`<div class="item">${carrito[i]} x ${i}<button onclick="eliminar('${i}')">X</button></div>`;
+}
+document.getElementById("listaCarrito").innerHTML=lista;
+}
+
+function eliminar(i){
+total -= carrito[i]*obtenerPrecio(i);
+delete carrito[i];
+actualizar();
+}
+
+function obtenerPrecio(n){
+for(let c of menuData){
+for(let p of c.items){
+if(p[0]===n) return p[1];
+}}
+}
+
+document.getElementById("pago").addEventListener("change",function(){
+document.getElementById("datosPago").style.display =
+this.value==="Transferencia"?"block":"none";
+});
+
+function copiarPago(){
+navigator.clipboard.writeText("BBVA - 4152 3140 0533 4605");
+alert("Datos copiados");
+}
+
+function enviarPedido(){
+
+let nombre = document.getElementById("nombreCliente").value;
+let direccion = document.getElementById("direccionCliente").value;
+let pago = document.getElementById("pago").value;
+
+if(nombre==""||direccion==""){alert("Faltan datos");return;}
+
+let num = (numeroPedido%2==0)?numero2:numero1;
+
+let texto="Pedido #"+numeroPedido+"\nCliente:"+nombre+"\n\n";
+
+for(let i in carrito){texto+=carrito[i]+" x "+i+"\n";}
+
+texto+="\nTotal:$"+total+"\nDirección:"+direccion+"\nPago:"+pago+"\n";
+
+if(pago==="Transferencia"){
+texto+="Enviar comprobante para confirmar.\n";
+}
+
+window.open("https://wa.me/"+num+"?text="+encodeURIComponent(texto));
+
+numeroPedido++;
+localStorage.setItem("pedido",numeroPedido);
+
+carrito={}; total=0; actualizar();
+
+document.getElementById("nombreCliente").value="";
+document.getElementById("direccionCliente").value="";
+}
+
+mostrar();
+
+</script>
+
+</body>
+</html>
